@@ -1,19 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native';
+import PostPage from './components/PostPage';
 export default function App() {
+  const { width } = Dimensions.get('window');
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+      <ScrollView pagingEnabled decelerationRate='fast' horizontal>
+          {colors.map(color => <PostPage color={color} />)}
+      </ScrollView>
+    
   );
+  
 }
+const colors = [
+  'blue',
+  'red',
+  'green',
+  'purple',
+  'yellow'
+]
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'silver',
     alignItems: 'center',
     justifyContent: 'center',
   },
