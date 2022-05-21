@@ -1,12 +1,10 @@
-import { StyleSheet, ScrollView, SafeAreaView, StatusBar } from "react-native";
-import PostPage from "./components/PostPage";
+import { AuthProvider } from "./components/AuthProvider";
+import { Router } from "./components/Router";
+
 export default function App() {
   return (
-    <ScrollView pagingEnabled decelerationRate="fast" horizontal>
-      {colors.map((color) => (
-        <PostPage color={color} />
-      ))}
-    </ScrollView>
+    <AuthProvider>
+      <Router />
+    </AuthProvider>
   );
 }
-const colors = ["blue", "red", "green"];

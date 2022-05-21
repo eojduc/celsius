@@ -7,6 +7,7 @@ import OpenPost from "./OpenPost";
 import { Modalize } from "react-native-modalize";
 import { collectionGroup, query, onSnapshot } from "firebase/firestore";
 import { firestore } from "../lib/firebase";
+import { useAuth } from "../lib/hooks";
 
 const PostPage = ({ color }) => {
   const [openPost, setOpenPost] = useState({});
@@ -14,6 +15,7 @@ const PostPage = ({ color }) => {
   const [posts, setPosts] = useState([]);
   const modalizeRef = useRef(null);
   const { width } = Dimensions.get("window");
+  const auth = useAuth();
 
   const closeModal = () => {
     modalizeRef.current.close();
@@ -47,10 +49,11 @@ const PostPage = ({ color }) => {
       </Modalize>
       <ScrollView vertical>
         {posts.map((post) => (
-          <PreviewPost data={post} onPress={openModal} />
+          <PreviewPost data={post} key={post.title} onPress={openModal} />
         ))}
       </ScrollView>
       <Button title="make post" onPress={() => setModal(true)} />
+      <Button title="logout" onPress={() => auth.signout()} />
     </View>
   );
 };
