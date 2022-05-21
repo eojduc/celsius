@@ -1,14 +1,17 @@
-import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Button, Dimensions } from "react-native";
 import { useState } from "react";
-import GestureRecognizer from "react-native-swipe-gestures";
 
-const OpenPost = ({ data, color, close }) => {
+const OpenPost = ({ data, color }) => {
+  const { height } = Dimensions.get('window');
   const [liked, setLiked] = useState(false);
   const toggleLiked = () => setLiked(!liked);
   const styles = StyleSheet.create({
-    backgroundColor: color,
-    justifyContent: "center",
-    flex: 1,
+    container: {
+      backgroundColor: color,
+      justifyContent: "top",
+      flex: 1,
+      height: height,    
+    },
     title: {
       fontSize: 40,
     },
@@ -17,8 +20,7 @@ const OpenPost = ({ data, color, close }) => {
     },
   });
   return (
-    <View style={styles}>
-      <Button onPress={close} title="close" />
+    <View style={styles.container}>
       <Text style={styles.title}>{data.title}</Text>
       <Text style={styles.content}>@{data.username}</Text>
       <Text style={styles.content}>{data.content}</Text>
