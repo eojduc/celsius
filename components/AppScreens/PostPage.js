@@ -11,8 +11,8 @@ import PreviewPost from "./PreviewPost";
 import OpenPost from "./OpenPost";
 import { Modalize } from "react-native-modalize";
 import { collectionGroup, query, onSnapshot } from "firebase/firestore";
-import { firestore } from "../lib/firebase";
-import { useAuth } from "../lib/hooks";
+import { firestore } from "../../lib/firebase";
+import { useAuth } from "../../lib/hooks";
 
 const PostPage = ({ color }) => {
   const [openPost, setOpenPost] = useState({});

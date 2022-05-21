@@ -1,5 +1,5 @@
-import { useProvideAuth } from "../lib/auth";
-import { authContext } from "../lib/context";
+import { useProvideAuth } from "../../lib/auth";
+import { authContext } from "../../lib/context";
 
 export function AuthProvider({ children }) {
   const auth = useProvideAuth();
