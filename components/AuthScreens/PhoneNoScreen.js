@@ -9,7 +9,10 @@ export function PhoneNoScreen({ currentStep, styles, handleChange }) {
     <>
       <Text>Create your account using your phone number</Text>
       <TextInput
-        placeholder={"Your Phone"}
+        placeholder={"999 999 9999"}
+        autoCompleteType="tel"
+        keyboardType="phone-pad"
+        textContentType="telephoneNumber"
         style={styles.input}
         onChangeText={handleChange}
       />

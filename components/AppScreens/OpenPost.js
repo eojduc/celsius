@@ -1,8 +1,14 @@
-import { View, Text, TouchableOpacity, StyleSheet, Button, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { useState } from "react";
 
 const OpenPost = ({ data, color }) => {
-  const { height } = Dimensions.get('window');
+  const { height } = Dimensions.get("window");
   const [liked, setLiked] = useState(false);
   const toggleLiked = () => setLiked(!liked);
   const styles = StyleSheet.create({
@@ -10,7 +16,7 @@ const OpenPost = ({ data, color }) => {
       backgroundColor: color,
       justifyContent: "top",
       flex: 1,
-      height: height,    
+      height: height,
     },
     title: {
       fontSize: 40,

@@ -82,7 +82,7 @@ const PostPage = ({ color }) => {
             <PreviewPost data={post} key={post.title} onPress={openModal} />
           ))}
         </ScrollView>
-        <Button title="make post" onPress={() => setModal(true)} />
+        <Button title="make post" onPress={() => console.log("Make post")} />
         <Button title="logout" onPress={() => auth.signout()} />
       </View>
     </View>

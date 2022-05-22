@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import {
+  FirebaseRecaptchaVerifierModal,
+  FirebaseRecaptchaBanner,
+} from "expo-firebase-recaptcha";
 import { NameScreen } from "./NameScreen";
 import { DOBScreen } from "./DOBScreen";
 import { PhoneNoScreen } from "./PhoneNoScreen";
+import { PhoneNoVerifScreen } from "./PhoneNoVerifScreen";
 import { useAuth } from "../../lib/hooks";
+import { app } from "../../lib/firebase";
 
 export function SignInScreen() {
   const [state, setState] = useState({
@@ -11,8 +17,10 @@ export function SignInScreen() {
     name: "",
     dob: "",
     phoneNumber: "",
+    verificationId: "",
+    verificationCode: "",
   });
-
+  const recaptchaVerifier = useRef(null);
   const auth = useAuth();
 
   const handleChange = (e) => {
@@ -34,11 +42,17 @@ export function SignInScreen() {
         phoneNumber: e,
       }));
     }
+    if (state.step == 3) {
+      setState((prevState) => ({
+        ...prevState,
+        verificationCode: e,
+      }));
+    }
   };
 
   const nextStep = () => {
     let currentStep = state.step;
-    currentStep = currentStep >= 1 ? 2 : currentStep + 1;
+    currentStep = currentStep >= 2 ? 3 : currentStep + 1;
 
     setState((prevState) => ({
       ...prevState,
@@ -65,8 +79,36 @@ export function SignInScreen() {
       );
     } else if (state.step == 2) {
       return (
-        <TouchableOpacity style={styles.button} onPress={() => auth.signinWithGoogle()}>
-          <Text>Submit</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            try {
+              auth
+                .sendVerificationCode(state.phoneNumber, recaptchaVerifier)
+                .then((res) => {
+                  setState((prevState) => ({
+                    ...prevState,
+                    verificationId: res,
+                  }));
+                });
+              nextStep();
+            } catch (err) {
+              console.log(err);
+            }
+          }}
+        >
+          <Text>Send Verification Code</Text>
+        </TouchableOpacity>
+      );
+    } else if (state.step == 3) {
+      return (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            auth.signinWithPhone(state.verificationId, state.verificationCode)
+          }
+        >
+          <Text>Confirm Code</Text>
         </TouchableOpacity>
       );
     }
@@ -86,10 +128,13 @@ export function SignInScreen() {
     return null;
   };
 
-  console.log(state);
-
   return (
     <View style={styles.container}>
+      <FirebaseRecaptchaVerifierModal
+        ref={recaptchaVerifier}
+        firebaseConfig={app.options}
+        // attemptInvisibleVerification
+      />
       <NameScreen
         currentStep={state.step}
         styles={styles}
@@ -101,6 +146,11 @@ export function SignInScreen() {
         handleChange={handleChange}
       />
       <PhoneNoScreen
+        currentStep={state.step}
+        styles={styles}
+        handleChange={handleChange}
+      />
+      <PhoneNoVerifScreen
         currentStep={state.step}
         styles={styles}
         handleChange={handleChange}
@@ -135,10 +185,6 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    fontSize: 24,
   },
 });
-
-// export function SignInScreen() {
-//   const auth = useAuth();
-//   return <Button title="signin" onPress={() => auth.signinWithGoogle()} />;
-// }

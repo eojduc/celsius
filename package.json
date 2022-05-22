@@ -27,7 +27,9 @@
     "firebase": "9.6.11",
     "expo-auth-session": "~3.6.1",
     "expo-random": "~12.2.0",
-    "expo-updates": "~0.13.1"
+    "expo-updates": "~0.13.1",
+    "expo-firebase-recaptcha": "~2.2.0",
+    "react-native-webview": "11.18.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
