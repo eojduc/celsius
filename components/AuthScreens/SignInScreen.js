@@ -17,38 +17,68 @@ export function SignInScreen() {
     name: "",
     dob: "",
     phoneNumber: "",
+    formattedPhoneNo: "",
     verificationId: "",
     verificationCode: "",
   });
   const recaptchaVerifier = useRef(null);
+  const [isValid, setIsValid] = useState(false);
   const auth = useAuth();
 
   const handleChange = (e) => {
+    const val = e;
+    const nameRe = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+
     if (state.step == 0) {
-      setState((prevState) => ({
-        ...prevState,
-        name: e,
-      }));
+      if (val.length > 2 && val.length < 50 && nameRe.test(val)) {
+        setState((prevState) => ({
+          ...prevState,
+          name: val,
+        }));
+        setIsValid(true);
+      } else {
+        setState((prevState) => ({
+          ...prevState,
+          name: "",
+        }));
+        setIsValid(false);
+      }
     }
     if (state.step == 1) {
       setState((prevState) => ({
         ...prevState,
-        dob: e,
+        dob: val,
       }));
+      if (val.length === 10) {
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
     }
     if (state.step == 2) {
       setState((prevState) => ({
         ...prevState,
         phoneNumber: e,
       }));
+      if (val.length === 12) {
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
     }
     if (state.step == 3) {
       setState((prevState) => ({
         ...prevState,
         verificationCode: e,
       }));
+      if (val.length === 6) {
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
     }
   };
+  console.log(state);
 
   const nextStep = () => {
     let currentStep = state.step;
@@ -58,6 +88,7 @@ export function SignInScreen() {
       ...prevState,
       step: currentStep,
     }));
+    setIsValid(false);
   };
 
   const prevStep = () => {
@@ -68,33 +99,44 @@ export function SignInScreen() {
       ...prevState,
       step: currentStep,
     }));
+    setIsValid(true);
   };
 
   const NextButton = () => {
     if (state.step < 2) {
       return (
-        <TouchableOpacity style={styles.button} onPress={nextStep}>
-          <Text>Next</Text>
+        <TouchableOpacity
+          onPress={nextStep}
+          style={isValid ? styles.enabledButton : styles.disabledButton}
+          disabled={!isValid}
+        >
+          <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       );
     } else if (state.step == 2) {
       return (
         <TouchableOpacity
-          style={styles.button}
+          style={isValid ? styles.enabledButton : styles.disabledButton}
           onPress={async () => {
             try {
+              const formattedPhoneNo =
+                "+1" + state.phoneNumber.replace(/ /g, "");
+              setState((prevState) => ({
+                ...prevState,
+                formattedPhoneNo: formattedPhoneNo,
+              }));
               auth
-                .sendVerificationCode(state.phoneNumber, recaptchaVerifier)
+                .sendVerificationCode(formattedPhoneNo, recaptchaVerifier)
                 .then((res) => {
-                  setState((prevState) => ({
-                    ...prevState,
-                    verificationId: res,
-                  }));
+                  if (res != undefined) {
+                    setState((prevState) => ({
+                      ...prevState,
+                      verificationId: res,
+                    }));
+                    nextStep();
+                  }
                 });
-              nextStep();
-            } catch (err) {
-              console.log(err);
-            }
+            } catch (err) {}
           }}
         >
           <Text>Send Verification Code</Text>
@@ -103,7 +145,7 @@ export function SignInScreen() {
     } else if (state.step == 3) {
       return (
         <TouchableOpacity
-          style={styles.button}
+          style={isValid ? styles.enabledButton : styles.disabledButton}
           onPress={() =>
             auth.signinWithPhone(state.verificationId, state.verificationCode)
           }
@@ -119,7 +161,7 @@ export function SignInScreen() {
   const PrevButton = () => {
     if (state.step !== 0) {
       return (
-        <TouchableOpacity style={styles.button} onPress={prevStep}>
+        <TouchableOpacity style={styles.enabledButton} onPress={prevStep}>
           <Text>Prev</Text>
         </TouchableOpacity>
       );
@@ -133,22 +175,26 @@ export function SignInScreen() {
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaVerifier}
         firebaseConfig={app.options}
-        // attemptInvisibleVerification
+        attemptInvisibleVerification={true}
       />
       <NameScreen
         currentStep={state.step}
         styles={styles}
         handleChange={handleChange}
+        name={state.name}
       />
       <DOBScreen
         currentStep={state.step}
         styles={styles}
         handleChange={handleChange}
+        name={state.name.split(" ")[0]}
+        formattedDOB={state.dob}
       />
       <PhoneNoScreen
         currentStep={state.step}
         styles={styles}
         handleChange={handleChange}
+        formattedNo={state.phoneNumber}
       />
       <PhoneNoVerifScreen
         currentStep={state.step}
@@ -159,6 +205,7 @@ export function SignInScreen() {
         <PrevButton />
         <NextButton />
       </View>
+      {state.step === 2 && <FirebaseRecaptchaBanner />}
     </View>
   );
 }
@@ -166,25 +213,40 @@ export function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    paddingTop: 75,
     alignItems: "center",
+    backgroundColor: "white",
   },
   buttonContainer: {
     flexDirection: "row",
     width: 300,
+    marginBottom: 20,
   },
-  button: {
+  enabledButton: {
     alignItems: "center",
-    backgroundColor: "#DDDDDD",
     padding: 10,
     marginRight: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  disabledButton: {
+    alignItems: "center",
+    padding: 10,
+    marginRight: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    opacity: 0.3,
+  },
+  buttonText: {
+    fontSize: 16,
   },
   input: {
     height: 75,
     width: 300,
     margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    fontSize: 24,
+    fontSize: 28,
+  },
+  header: {
+    fontSize: 18,
   },
 });

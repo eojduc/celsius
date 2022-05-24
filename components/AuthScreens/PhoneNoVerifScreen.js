@@ -7,11 +7,13 @@ export function PhoneNoVerifScreen({ currentStep, styles, handleChange }) {
 
   return (
     <>
-      <Text>Verify your Phone Number</Text>
+      <Text style={styles.header}>Verify your Phone Number</Text>
       <TextInput
         placeholder={"123456"}
         style={styles.input}
         onChangeText={handleChange}
+        keyboardType="numeric"
+        maxLength={6}
       />
     </>
   );

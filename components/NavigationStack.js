@@ -18,12 +18,23 @@ export const AppStack = () => {
 
 export const AuthStack = () => {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="Sign In Screen" component={SignInScreen} />
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Sign In Screen"
+        component={SignInScreen}
+        options={{
+          title: "Celsius.",
+          headerStyle: {
+            backgroundColor: "white",
+          },
+          headerTintColor: "black",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 24,
+          },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack.Navigator>
   );
 };
